@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classroom Jelly Hub - 可爱果冻风移动端课堂助手</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome & Google Fonts (Fredoka & Quicksand) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Quicksand', 'Fredoka', 'system-ui', 'sans-serif'],
+            fun: ['Fredoka', 'sans-serif']
+          },
+          colors: {
+            jelly: {
+              pink: '#ff80ab',
+              pinkLight: '#ffb2dd',
+              purple: '#b388ff',
+              purpleLight: '#d1c4e9',
+              mint: '#64ffda',
+              mintDark: '#1de9b6',
+              yellow: '#ffd54f',
+              blue: '#80d8ff',
+              blueDark: '#40c4ff',
+              orange: '#ff9e80',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+    }
+
+    /* Glossy Jelly Button Base Style */
+    .jelly-btn {
+      position: relative;
+      user-select: none;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 
+        0 8px 20px -4px var(--jelly-shadow, rgba(255, 128, 171, 0.45)),
+        inset 0 3px 4px rgba(255, 255, 255, 0.8),
+        inset 0 -4px 6px rgba(0, 0, 0, 0.15);
+    }
+    .jelly-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      filter: brightness(1.05);
+    }
+    .jelly-btn:active {
+      transform: translateY(3px) scale(0.93) !important;
+      box-shadow: 
+        0 3px 8px -2px var(--jelly-shadow, rgba(255, 128, 171, 0.3)),
+        inset 0 1px 2px rgba(255, 255, 255, 0.6),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    /* Color Variants for Jelly Buttons */
+    .jelly-pink {
+      background: linear-gradient(135deg, #ff94ba 0%, #ff5252 100%);
+      --jelly-shadow: rgba(255, 82, 82, 0.45);
+      color: white;
+    }
+    .jelly-purple {
+      background: linear-gradient(135deg, #c792ea 0%, #7c4dff 100%);
+      --jelly-shadow: rgba(124, 77, 255, 0.45);
+      color: white;
+    }
+    .jelly-mint {
+      background: linear-gradient(135deg, #a7ffeb 0%, #00bfa5 100%);
+      --jelly-shadow: rgba(0, 191, 165, 0.4);
+      color: #004d40;
+    }
+    .jelly-yellow {
+      background: linear-gradient(135deg, #ffe082 0%, #ffab00 100%);
+      --jelly-shadow: rgba(255, 171, 0, 0.45);
+      color: #5d4037;
+    }
+    .jelly-blue {
+      background: linear-gradient(135deg, #b3e5fc 0%, #00b0ff 100%);
+      --jelly-shadow: rgba(0, 176, 255, 0.4);
+      color: #01579b;
+    }
+
+    /* Soft Glassmorphism Cards */
+    .jelly-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border: 2px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 12px 32px -8px rgba(186, 150, 218, 0.25);
+      border-radius: 24px;
+    }
+
+    /* Squishy Bounce Keyframe Animation */
+    @keyframes squishyBounce {
+      0% { transform: scale(1, 1); }
+      30% { transform: scale(1.12, 0.88); }
+      50% { transform: scale(0.92, 1.08); }
+      70% { transform: scale(1.04, 0.96); }
+      100% { transform: scale(1, 1); }
+    }
+    .animate-squishy {
+      animation: squishyBounce 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    }
+
+    /* Floating Bubble Effects */
+    @keyframes floatBubble {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(3deg); }
+    }
+    .float-bubble {
+      animation: floatBubble 4s ease-in-out infinite;
+    }
+
+    /* Mobile Phone Shell Frame Styling */
+    .phone-wrapper {
+      width: 100%;
+      max-width: 390px;
+      height: 780px;
+      background: #0f172a;
+      border-radius: 48px;
+      padding: 12px;
+      box-shadow: 
+        0 25px 60px -15px rgba(0, 0, 0, 0.6),
+        inset 0 0 0 3px rgba(255, 255, 255, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .phone-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 38px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: linear-gradient(165deg, #fff5f8 0%, #f3e8ff 50%, #e0f2fe 100%);
+    }
+
+    /* Dynamic Island / Notch */
+    .dynamic-island {
+      width: 110px;
+      height: 25px;
+      background: #000;
+      border-radius: 20px;
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      display: flex;
+      items-center;
+      justify-content: space-between;
+      padding: 0 10px;
+    }
+  </style>
+</head>
+
+<body class="h-full bg-slate-950 text-slate-800 font-sans antialiased overflow-x-hidden flex flex-col">
+
+  <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-2xl jelly-pink flex items-center justify-center text-xl shadow-lg animate-bounce">
+          🍬
+        </div>
+        <div>
+          <h1 class="font-fun font-bold text-lg text-white tracking-wide flex items-center gap-2">
+            Classroom Jelly Hub <span class="text-xs px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 font-sans">移动手机版</span>
+          </h1>
+          <p class="text-xs text-slate-400">实时果冻触感 · 双端极速同步课堂助手</p>
+        </div>
+      </div>
+
+      <!-- Controls: Switch Layout & Sound -->
+      <div class="flex items-center gap-2">
+        <!-- Viewport Mode Switcher -->
+        <div class="bg-slate-800 p-1 rounded-xl flex border border-slate-700/80 text-xs font-semibold">
+          <button id="view-mode-dual" onclick="setViewMode('dual')" class="px-3 py-1.5 rounded-lg text-white bg-indigo-600 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+            <span>双机同屏对照</span>
+          </button>
+          <button id="view-mode-student" onclick="setViewMode('student')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5">
+            <i class="fa-solid fa-user-graduate"></i>
+            <span>仅学生端</span>
+          </button>
+          <button id="view-mode-teacher" onclick="setViewMode('teacher')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5">
+            <i class="fa-solid fa-chalkboard-user"></i>
+            <span>仅教师端</span>
+          </button>
+        </div>
+
+        <!-- Audio Sound Toggle -->
+        <button id="sound-btn" onclick="toggleAudio()" class="p-2.5 bg-slate-800 hover:bg-slate-700 text-pink-400 rounded-xl transition border border-slate-700" title="果冻啵啵音效">
+          <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 flex items-center justify-center">
+
+    <div id="simulators-container" class="w-full flex flex-wrap justify-center items-center gap-8 py-2">
+
+      <!-- ========================================================= -->
+      <!-- MOBILE FRAME 1: STUDENT PHONE APP                         -->
+      <!-- ========================================================= -->
+      <div id="wrapper-student-phone" class="phone-wrapper transition-all duration-300">
+        <div class="phone-inner">
+
+          <!-- Phone Status Bar -->
+          <div class="dynamic-island">
+            <div class="w-2.5 h-2.5 rounded-full bg-slate-800"></div>
+            <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+          </div>
+
+          <div class="pt-10 px-4 pb-2 bg-gradient-to-b from-pink-100/80 to-transparent flex items-center justify-between z-10 shrink-0">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold font-fun text-slate-500">9:41</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-pink-200 text-pink-700 border border-pink-300/80">
+                学生端 🎒
+              </span>
+            </div>
+            <div class="flex items-center gap-1 text-[11px] font-bold text-slate-600 bg-white/70 px-2.5 py-1 rounded-full shadow-sm">
+              <span>房间:</span>
+              <span id="student-room-badge" class="text-pink-600 font-mono">SWEET88</span>
+            </div>
+          </div>
+
+          <!-- Student App Body Container -->
+          <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
+
+            <!-- Student Profile Header Card -->
+            <div class="jelly-card p-3.5 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl jelly-pink flex items-center justify-center text-xl shadow-md">
+                  🐰
+                </div>
+                <div>
+                  <h3 id="student-name-display" class="font-fun font-bold text-slate-800 text-sm">小糖果 (Student)</h3>
+                  <p class="text-[11px] text-pink-500 font-medium">课堂通信连线中 • 直通老师端</p>
+                </div>
+              </div>
+              <button onclick="changeStudentName()" class="p-2 text-slate-400 hover:text-pink-500 transition text-xs" title="改名">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+            </div>
+
+            <!-- Student App Navigation Tabs -->
+            <div class="grid grid-cols-2 gap-2 p-1 bg-white/60 backdrop-blur rounded-2xl border border-white/80 shadow-sm">
+              <button id="student-nav-leave" onclick="switchStudentTab('leave')" class="py-2.5 rounded-xl font-fun font-bold text-xs jelly-pink shadow-sm transition">
+                🚪 外出申请
+              </button>
+              <button id="student-nav-answer" onclick="switchStudentTab('answer')" class="py-2.5 rounded-xl font-fun font-bold text-xs text-slate-500 hover:text-slate-800 transition">
+                ✏️ 私密答题
+              </button>
+            </div>
+
+            <!-- TAB 1: OUTSIDE ROOM REQUEST -->
+            <div id="student-tab-leave-content" class="space-y-4">
+
+              <!-- Active Status Alert Card (If pending or approved) -->
+              <div id="student-leave-status-box" class="hidden jelly-card p-4 border-2 transition-all">
+                <div class="flex items-center justify-between mb-2">
+                  <span id="student-status-title" class="font-fun font-bold text-xs uppercase tracking-wider">申请状态</span>
+                  <button onclick="cancelStudentLeaveRequest()" class="text-[11px] text-rose-400 hover:text-rose-600 font-bold underline">
+                    撤销申请
+                  </button>
+                </div>
+
+                <div id="student-status-badge" class="flex items-center gap-2 text-xs font-bold py-1">
+                  <!-- Dynamic content from JS -->
+                </div>
+
+                <!-- Timer countdown if approved -->
+                <div id="student-timer-container" class="hidden mt-2 p-2.5 rounded-xl bg-emerald-100/80 border border-emerald-200 text-center">
+                  <p class="text-[10px] text-emerald-700 font-bold uppercase tracking-wider">准许外出剩余倒计时</p>
+                  <p id="student-timer-text" class="text-2xl font-fun font-extrabold text-emerald-600 my-0.5">05:00</p>
+                  <p class="text-[10px] text-emerald-600">回教室后请老师点击“标记归队”哦~</p>
+                </div>
+              </div>
+
+              <!-- Leave Reason Selection Header -->
+              <div>
+                <label class="block text-[11px] font-fun font-bold text-slate-600 uppercase tracking-wider mb-2 ml-1">
+                  选择外出原因 (带可爱Emoji)
+                </label>
+                <!-- 6 Preset Grid Options including new Food Option -->
+                <div class="grid grid-cols-2 gap-2.5">
+                  <button type="button" onclick="selectReason('🚽 咕噜咕噜~去洗手间', this)" class="reason-btn active jelly-card p-3 text-left hover:border-pink-300 transition border-2 border-pink-400 bg-pink-50/80">
+                    <span class="text-lg block mb-0.5">🚽</span>
+                    <span class="font-fun font-bold text-xs text-slate-700 block">去洗手间</span>
+                    <span class="text-[10px] text-slate-400">咕噜咕噜~</span>
+                  </button>
+
+                  <button type="button" onclick="selectReason('💧 吨吨吨~去喝水', this)" class="reason-btn jelly-card p-3 text-left hover:border-pink-300 transition border-2 border-transparent">
+                    <span class="text-lg block mb-0.5">💧</span>
+                    <span class="font-fun font-bold text-xs text-slate-700 block">去喝水</span>
+                    <span class="text-[10px] text-slate-400">吨吨吨补充水分</span>
+                  </button>
+
+                  <button type="button" onclick="selectReason('🎒 拿个东西~拿取物品', this)" class="reason-btn jelly-card p-3 text-left hover:border-pink-300 transition border-2 border-transparent">
+                    <span class="text-lg block mb-0.5">🎒</span>
+                    <span class="font-fun font-bold text-xs text-slate-700 block">拿取物品</span>
+                    <span class="text-[10px] text-slate-400">回储物柜/拿书本</span>
+                  </button>
+
+                  <button type="button" onclick="selectReason('🤒 身体不适~去医务室', this)" class="reason-btn jelly-card p-3 text-left hover:border-pink-300 transition border-2 border-transparent">
+                    <span class="text-lg block mb-0.5">🤒</span>
+                    <span class="font-fun font-bold text-xs text-slate-700 block">去医务室</span>
+                    <span class="text-[10px] text-slate-400">身体稍微不舒服</span>
+                  </button>
+
+                  <!-- NEW REQUESTED FEATURE: FOOD / EAT OPTION -->
+                  <button type="button" onclick="selectReason('🥪 肚肚饿了~外出吃东西', this)" class="reason-btn jelly-card p-3 text-left hover:border-pink-300 transition border-2 border-transparent">
+                    <span class="text-lg block mb-0.5">🥪</span>
+                    <span class="font-fun font-bold text-xs text-slate-700 block">外出吃东西</span>
+                    <span class="text-[10px] text-slate-400">肚肚饿了补充能量</span>
+                  </button>
+
+                  <button type="button" onclick="selectReason('✏️ 其他紧急状况', this)" class="reason-btn jelly-card p-3 text-left hover:border-pink-300 transition border-2 border-transparent">
+                    <span class="text-lg block mb-0.5">✏️</span>
+                    <span class="font-fun font-bold text-xs text-slate-700 block">其他紧急状况</span>
+                    <span class="text-[10px] text-slate-400">自定义特殊说明</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Duration Selector -->
+              <div>
+                <label class="block text-[11px] font-fun font-bold text-slate-600 uppercase tracking-wider mb-2 ml-1">
+                  预计外出时长
+                </label>
+                <div class="grid grid-cols-4 gap-2">
+                  <button type="button" onclick="selectDuration(3, this)" class="duration-btn py-2 rounded-xl text-xs font-bold font-fun jelly-card text-center border-2 border-pink-400 bg-pink-50">3分钟</button>
+                  <button type="button" onclick="selectDuration(5, this)" class="duration-btn py-2 rounded-xl text-xs font-bold font-fun jelly-card text-center border-2 border-transparent">5分钟</button>
+                  <button type="button" onclick="selectDuration(10, this)" class="duration-btn py-2 rounded-xl text-xs font-bold font-fun jelly-card text-center border-2 border-transparent">10分钟</button>
+                  <button type="button" onclick="selectDuration(15, this)" class="duration-btn py-2 rounded-xl text-xs font-bold font-fun jelly-card text-center border-2 border-transparent">15分钟</button>
+                </div>
+              </div>
+
+              <!-- Custom Note Input -->
+              <div>
+                <input type="text" id="student-custom-note" placeholder="可选补充说明 (例如: 第2节课后归队)" 
+                       class="w-full rounded-2xl bg-white/80 border border-slate-200 px-4 py-2.5 text-xs text-slate-700 focus:outline-none focus:border-pink-400 transition placeholder-slate-400 shadow-inner">
+              </div>
+
+              <!-- Submit Jelly Button -->
+              <button onclick="submitStudentLeaveRequest()" class="w-full py-3.5 rounded-full jelly-btn jelly-pink font-fun font-bold text-sm tracking-wide shadow-lg flex items-center justify-center gap-2">
+                <span>发送外出申请 🚀</span>
+              </button>
+            </div>
+
+            <!-- TAB 2: PRIVATE ANSWER SUBMISSION -->
+            <div id="student-tab-answer-content" class="hidden space-y-4">
+              
+              <div class="jelly-card p-3.5 bg-gradient-to-r from-purple-100/90 to-pink-100/90 border border-purple-200">
+                <div class="flex items-center gap-2 text-xs font-fun font-bold text-purple-700">
+                  <i class="fa-solid fa-user-shield text-base"></i>
+                  <span>直传老师端 • 绝对不公开给其他同学</span>
+                </div>
+              </div>
+
+              <!-- Question & Choice Section -->
+              <div>
+                <label class="block text-[11px] font-fun font-bold text-slate-600 uppercase tracking-wider mb-2 ml-1">
+                  选择对应题目
+                </label>
+                <div class="flex gap-2">
+                  <select id="student-question-select" class="flex-1 rounded-2xl bg-white/90 border border-slate-200 px-3 py-2.5 text-xs font-fun font-bold text-slate-700 focus:outline-none focus:border-purple-400">
+                    <option value="第1题 (Q1)">第1题 (Q1)</option>
+                    <option value="第2题 (Q2)">第2题 (Q2)</option>
+                    <option value="第3题 (Q3)">第3题 (Q3)</option>
+                    <option value="第4题 (Q4)">第4题 (Q4)</option>
+                    <option value="自由提问/回答">自由提问/回答</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Quick Choice Option Buttons A/B/C/D -->
+              <div>
+                <label class="block text-[11px] font-fun font-bold text-slate-600 uppercase tracking-wider mb-2 ml-1">
+                  快速选择题答案 (可选)
+                </label>
+                <div class="grid grid-cols-4 gap-2">
+                  <button type="button" onclick="selectChoiceOption('A', this)" class="choice-opt-btn py-2.5 rounded-xl jelly-card font-fun font-extrabold text-sm text-purple-700 hover:bg-purple-100 transition border-2 border-transparent">A</button>
+                  <button type="button" onclick="selectChoiceOption('B', this)" class="choice-opt-btn py-2.5 rounded-xl jelly-card font-fun font-extrabold text-sm text-purple-700 hover:bg-purple-100 transition border-2 border-transparent">B</button>
+                  <button type="button" onclick="selectChoiceOption('C', this)" class="choice-opt-btn py-2.5 rounded-xl jelly-card font-fun font-extrabold text-sm text-purple-700 hover:bg-purple-100 transition border-2 border-transparent">C</button>
+                  <button type="button" onclick="selectChoiceOption('D', this)" class="choice-opt-btn py-2.5 rounded-xl jelly-card font-fun font-extrabold text-sm text-purple-700 hover:bg-purple-100 transition border-2 border-transparent">D</button>
+                </div>
+              </div>
+
+              <!-- Text Detail Input -->
+              <div>
+                <label class="block text-[11px] font-fun font-bold text-slate-600 uppercase tracking-wider mb-2 ml-1">
+                  输入个人解析或文字答案
+                </label>
+                <textarea id="student-answer-text" rows="3" placeholder="在这里写下你的解答思路或选项解释..."
+                          class="w-full rounded-2xl bg-white/90 border border-slate-200 p-3 text-xs text-slate-700 focus:outline-none focus:border-purple-400 transition placeholder-slate-400 resize-none shadow-inner custom-scrollbar"></textarea>
+              </div>
+
+              <!-- Submit Answer Jelly Button -->
+              <button onclick="submitStudentAnswer()" class="w-full py-3.5 rounded-full jelly-btn jelly-purple font-fun font-bold text-sm tracking-wide shadow-lg flex items-center justify-center gap-2">
+                <span>🔒 提交个人答案给老师</span>
+              </button>
+
+              <!-- Feedback / Praise Inbox from Teacher -->
+              <div class="pt-2">
+                <h4 class="font-fun font-bold text-xs text-slate-600 mb-2 flex items-center gap-1.5">
+                  <i class="fa-solid fa-award text-amber-500"></i>
+                  <span>老师给我的互动与小红花</span>
+                </h4>
+                <div id="student-feedback-list" class="space-y-2 max-h-36 overflow-y-auto custom-scrollbar">
+                  <p class="text-[11px] text-slate-400 italic py-2 text-center">暂未收到互动评语~</p>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Phone Home Bar -->
+          <div class="h-5 bg-transparent flex items-center justify-center shrink-0 pb-1">
+            <div class="w-28 h-1 bg-slate-300 rounded-full"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- MOBILE FRAME 2: TEACHER PHONE / APP CONTROLLER             -->
+      <!-- ========================================================= -->
+      <div id="wrapper-teacher-phone" class="phone-wrapper transition-all duration-300">
+        <div class="phone-inner">
+
+          <!-- Phone Status Bar -->
+          <div class="dynamic-island">
+            <div class="w-2.5 h-2.5 rounded-full bg-slate-800"></div>
+            <div class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></div>
+          </div>
+
+          <div class="pt-10 px-4 pb-2 bg-gradient-to-b from-indigo-100/80 to-transparent flex items-center justify-between z-10 shrink-0">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold font-fun text-slate-500">9:41</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-200 text-indigo-800 border border-indigo-300/80">
+                教师端 👩‍🏫
+              </span>
+            </div>
+            <div class="flex items-center gap-1 text-[11px] font-bold text-slate-600 bg-white/70 px-2 py-0.5 rounded-full shadow-sm">
+              <button onclick="copyRoomCode()" class="text-indigo-600 hover:text-indigo-800 font-mono flex items-center gap-1" title="复制房间号">
+                <span id="teacher-room-code">SWEET88</span>
+                <i class="fa-regular fa-copy text-[10px]"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Teacher App Main Container -->
+          <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
+
+            <!-- Teacher Navigation Tabs -->
+            <div class="grid grid-cols-2 gap-2 p-1 bg-white/60 backdrop-blur rounded-2xl border border-white/80 shadow-sm">
+              <button id="teacher-nav-leave" onclick="switchTeacherTab('leave')" class="py-2.5 rounded-xl font-fun font-bold text-xs jelly-yellow shadow-sm transition flex items-center justify-center gap-1">
+                <span>外出审批</span>
+                <span id="badge-teacher-pending" class="px-1.5 py-0.2 bg-rose-500 text-white rounded-full text-[10px]">0</span>
+              </button>
+              <button id="teacher-nav-answers" onclick="switchTeacherTab('answers')" class="py-2.5 rounded-xl font-fun font-bold text-xs text-slate-500 hover:text-slate-800 transition flex items-center justify-center gap-1">
+                <span>私密答案箱</span>
+                <span id="badge-teacher-answers" class="px-1.5 py-0.2 bg-indigo-500 text-white rounded-full text-[10px]">0</span>
+              </button>
+            </div>
+
+            <!-- TEACHER TAB 1: OUTSIDE REQUESTS MANAGEMENT -->
+            <div id="teacher-tab-leave-content" class="space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="font-fun font-bold text-xs text-slate-700">实时请求列表</h3>
+                <span class="text-[10px] text-slate-400">实时自动同步</span>
+              </div>
+
+              <!-- List of Requests -->
+              <div id="teacher-requests-list" class="space-y-3">
+                <!-- Injected dynamically via JS -->
+                <div class="jelly-card p-6 text-center border-dashed border-2 border-slate-200">
+                  <span class="text-2xl block mb-1">☕</span>
+                  <p class="font-fun font-bold text-xs text-slate-500">当前没有学生申请外出</p>
+                  <p class="text-[10px] text-slate-400 mt-1">当学生提交申请时，卡片将立刻在这里出现~</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- TEACHER TAB 2: PRIVATE ANSWERS INBOX -->
+            <div id="teacher-tab-answers-content" class="hidden space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="font-fun font-bold text-xs text-slate-700">学生个人私密答题</h3>
+                <button onclick="clearAllAnswers()" class="text-[10px] text-rose-500 font-bold hover:underline">
+                  清空收件箱
+                </button>
+              </div>
+
+              <!-- Answers List -->
+              <div id="teacher-answers-list" class="space-y-3">
+                <div class="jelly-card p-6 text-center border-dashed border-2 border-slate-200">
+                  <span class="text-2xl block mb-1">📮</span>
+                  <p class="font-fun font-bold text-xs text-slate-500">尚无提交的个人答案</p>
+                  <p class="text-[10px] text-slate-400 mt-1">学生提交答案后仅在此处对您单独公开</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Phone Home Bar -->
+          <div class="h-5 bg-transparent flex items-center justify-center shrink-0 pb-1">
+            <div class="w-28 h-1 bg-slate-300 rounded-full"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    // Global Application State & Storage
+    const ROOM_CODE = "SWEET88";
+    let studentName = "小糖果 🍬";
+    let activeReason = "🚽 咕噜咕噜~去洗手间";
+    let activeDuration = 5; // minutes
+    let activeChoiceOption = "";
+    let soundEnabled = true;
+
+    // Local state stores
+    let leaveRequests = [];
+    let studentAnswers = [];
+    let studentFeedbacks = [];
+
+    // Helper function to safely escape HTML special characters and prevent runtime reference errors
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Real-time Sync Channel via BroadcastChannel API (Instant multi-tab/single-tab sync)
+    const syncChannel = new BroadcastChannel("classroom_jelly_hub_channel");
+
+    // Audio Synthesizer (Web Audio API - Cute Pop Sounds)
+    function playJellyPopSound(type = 'pop') {
+      if (!soundEnabled) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'approve') {
+          // Double cheery melody for approval
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+          osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // A5
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        } else if (type === 'submit') {
+          // Bubble squishy pop sound
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(300, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(700, ctx.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.25, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+        } else {
+          // Default soft bloop
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.1);
+          gain.gain.setValueAtTime(0.15, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        }
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.35);
+      } catch (e) {
+        console.warn("Audio Context sound error:", e);
+      }
+    }
+
+    // Toggle Audio Sound
+    function toggleAudio() {
+      soundEnabled = !soundEnabled;
+      const icon = document.getElementById("sound-icon");
+      if (soundEnabled) {
+        icon.className = "fa-solid fa-volume-high";
+        playJellyPopSound('submit');
+      } else {
+        icon.className = "fa-solid fa-volume-xmark text-slate-500";
+      }
+    }
+
+    // Viewport Mode Switcher (Dual Frame vs Single Phone Frame)
+    function setViewMode(mode) {
+      playJellyPopSound('pop');
+      const studentFrame = document.getElementById('wrapper-student-phone');
+      const teacherFrame = document.getElementById('wrapper-teacher-phone');
+
+      const btnDual = document.getElementById('view-mode-dual');
+      const btnStudent = document.getElementById('view-mode-student');
+      const btnTeacher = document.getElementById('view-mode-teacher');
+
+      // Reset button classes
+      [btnDual, btnStudent, btnTeacher].forEach(b => {
+        b.className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5";
+      });
+
+      if (mode === 'dual') {
+        btnDual.className = "px-3 py-1.5 rounded-lg text-white bg-indigo-600 transition flex items-center gap-1.5";
+        studentFrame.style.display = 'block';
+        teacherFrame.style.display = 'block';
+      } else if (mode === 'student') {
+        btnStudent.className = "px-3 py-1.5 rounded-lg text-white bg-pink-600 transition flex items-center gap-1.5";
+        studentFrame.style.display = 'block';
+        teacherFrame.style.display = 'none';
+      } else if (mode === 'teacher') {
+        btnTeacher.className = "px-3 py-1.5 rounded-lg text-white bg-indigo-600 transition flex items-center gap-1.5";
+        studentFrame.style.display = 'none';
+        teacherFrame.style.display = 'block';
+      }
+    }
+
+    // Broadcast Channel Synchronization Event Listener
+    syncChannel.onmessage = (event) => {
+      const { type, payload } = event.data;
+      if (type === 'STATE_UPDATE') {
+        leaveRequests = payload.leaveRequests || [];
+        studentAnswers = payload.studentAnswers || [];
+        studentFeedbacks = payload.studentFeedbacks || [];
+        renderAll();
+      }
+    };
+
+    function broadcastState() {
+      // Save local storage backup
+      localStorage.setItem("jelly_leave_requests", JSON.stringify(leaveRequests));
+      localStorage.setItem("jelly_student_answers", JSON.stringify(studentAnswers));
+      localStorage.setItem("jelly_student_feedbacks", JSON.stringify(studentFeedbacks));
+
+      // Post broadcast message
+      syncChannel.postMessage({
+        type: 'STATE_UPDATE',
+        payload: { leaveRequests, studentAnswers, studentFeedbacks }
+      });
+
+      renderAll();
+    }
+
+    // Load persisted state on startup
+    function loadPersistedState() {
+      try {
+        leaveRequests = JSON.parse(localStorage.getItem("jelly_leave_requests") || "[]");
+        studentAnswers = JSON.parse(localStorage.getItem("jelly_student_answers") || "[]");
+        studentFeedbacks = JSON.parse(localStorage.getItem("jelly_student_feedbacks") || "[]");
+      } catch (e) {
+        leaveRequests = [];
+        studentAnswers = [];
+        studentFeedbacks = [];
+      }
+      renderAll();
+    }
+
+    // STUDENT APP LOGIC
+    function switchStudentTab(tab) {
+      playJellyPopSound('pop');
+      const btnLeave = document.getElementById('student-nav-leave');
+      const btnAnswer = document.getElementById('student-nav-answer');
+      const contentLeave = document.getElementById('student-tab-leave-content');
+      const contentAnswer = document.getElementById('student-tab-answer-content');
+
+      if (tab === 'leave') {
+        btnLeave.className = "py-2.5 rounded-xl font-fun font-bold text-xs jelly-pink shadow-sm transition";
+        btnAnswer.className = "py-2.5 rounded-xl font-fun font-bold text-xs text-slate-500 hover:text-slate-800 transition";
+        contentLeave.classList.remove('hidden');
+        contentAnswer.classList.add('hidden');
+      } else {
+        btnAnswer.className = "py-2.5 rounded-xl font-fun font-bold text-xs jelly-purple shadow-sm transition";
+        btnLeave.className = "py-2.5 rounded-xl font-fun font-bold text-xs text-slate-500 hover:text-slate-800 transition";
+        contentAnswer.classList.remove('hidden');
+        contentLeave.classList.add('hidden');
+      }
+    }
+
+    function selectReason(reasonText, btnElem) {
+      playJellyPopSound('pop');
+      activeReason = reasonText;
+      document.querySelectorAll('.reason-btn').forEach(b => {
+        b.className = "reason-btn jelly-card p-3 text-left hover:border-pink-300 transition border-2 border-transparent";
+      });
+      btnElem.className = "reason-btn jelly-card p-3 text-left hover:border-pink-300 transition border-2 border-pink-400 bg-pink-50/80";
+    }
+
+    function selectDuration(mins, btnElem) {
+      playJellyPopSound('pop');
+      activeDuration = mins;
+      document.querySelectorAll('.duration-btn').forEach(b => {
+        b.className = "duration-btn py-2 rounded-xl text-xs font-bold font-fun jelly-card text-center border-2 border-transparent";
+      });
+      btnElem.className = "duration-btn py-2 rounded-xl text-xs font-bold font-fun jelly-card text-center border-2 border-pink-400 bg-pink-50";
+    }
+
+    function changeStudentName() {
+      const newName = prompt("请输入你的全名或萌萌哒昵称:", studentName);
+      if (newName && newName.trim() !== "") {
+        studentName = newName.trim();
+        document.getElementById('student-name-display').textContent = studentName;
+      }
+    }
+
+    function submitStudentLeaveRequest() {
+      playJellyPopSound('submit');
+      const customNote = document.getElementById('student-custom-note').value.trim();
+
+      // Check if student already has a pending or active request
+      const existing = leaveRequests.find(r => r.studentName === studentName);
+      if (existing) {
+        leaveRequests = leaveRequests.filter(r => r.studentName !== studentName);
+      }
+
+      const newReq = {
+        id: "REQ_" + Date.now(),
+        studentName: studentName,
+        reason: activeReason,
+        durationMins: activeDuration,
+        customNote: customNote,
+        status: 'pending', // 'pending', 'approved', 'rejected'
+        timestamp: Date.now(),
+        approvedTime: null
+      };
+
+      leaveRequests.unshift(newReq);
+      document.getElementById('student-custom-note').value = "";
+      broadcastState();
+    }
+
+    function cancelStudentLeaveRequest() {
+      playJellyPopSound('pop');
+      leaveRequests = leaveRequests.filter(r => r.studentName !== studentName);
+      broadcastState();
+    }
+
+    // STUDENT PRIVATE ANSWER SUBMISSION LOGIC
+    function selectChoiceOption(opt, btnElem) {
+      playJellyPopSound('pop');
+      if (activeChoiceOption === opt) {
+        activeChoiceOption = "";
+        btnElem.className = "choice-opt-btn py-2.5 rounded-xl jelly-card font-fun font-extrabold text-sm text-purple-700 hover:bg-purple-100 transition border-2 border-transparent";
+      } else {
+        activeChoiceOption = opt;
+        document.querySelectorAll('.choice-opt-btn').forEach(b => {
+          b.className = "choice-opt-btn py-2.5 rounded-xl jelly-card font-fun font-extrabold text-sm text-purple-700 hover:bg-purple-100 transition border-2 border-transparent";
+        });
+        btnElem.className = "choice-opt-btn py-2.5 rounded-xl jelly-card font-fun font-extrabold text-sm text-white bg-purple-600 transition border-2 border-purple-500 shadow-md";
+      }
+    }
+
+    function submitStudentAnswer() {
+      const questionNum = document.getElementById('student-question-select').value;
+      const answerText = document.getElementById('student-answer-text').value.trim();
+
+      if (!activeChoiceOption && !answerText) {
+        alert("请先选择选项(A/B/C/D)或输入文字回答哦~");
+        return;
+      }
+
+      playJellyPopSound('submit');
+
+      const newAns = {
+        id: "ANS_" + Date.now(),
+        studentName: studentName,
+        questionNum: questionNum,
+        choiceOption: activeChoiceOption,
+        answerText: answerText,
+        timestamp: Date.now()
+      };
+
+      studentAnswers.unshift(newAns);
+      document.getElementById('student-answer-text').value = "";
+      activeChoiceOption = "";
+      document.querySelectorAll('.choice-opt-btn').forEach(b => {
+        b.className = "choice-opt-btn py-2.5 rounded-xl jelly-card font-fun font-extrabold text-sm text-purple-700 hover:bg-purple-100 transition border-2 border-transparent";
+      });
+
+      broadcastState();
+    }
+
+    // TEACHER APP LOGIC
+    function switchTeacherTab(tab) {
+      playJellyPopSound('pop');
+      const btnLeave = document.getElementById('teacher-nav-leave');
+      const btnAnswers = document.getElementById('teacher-nav-answers');
+      const contentLeave = document.getElementById('teacher-tab-leave-content');
+      const contentAnswers = document.getElementById('teacher-tab-answers-content');
+
+      if (tab === 'leave') {
+        btnLeave.className = "py-2.5 rounded-xl font-fun font-bold text-xs jelly-yellow shadow-sm transition flex items-center justify-center gap-1";
+        btnAnswers.className = "py-2.5 rounded-xl font-fun font-bold text-xs text-slate-500 hover:text-slate-800 transition flex items-center justify-center gap-1";
+        contentLeave.classList.remove('hidden');
+        contentAnswers.classList.add('hidden');
+      } else {
+        btnAnswers.className = "py-2.5 rounded-xl font-fun font-bold text-xs jelly-blue shadow-sm transition flex items-center justify-center gap-1";
+        btnLeave.className = "py-2.5 rounded-xl font-fun font-bold text-xs text-slate-500 hover:text-slate-800 transition flex items-center justify-center gap-1";
+        contentAnswers.classList.remove('hidden');
+        contentLeave.classList.add('hidden');
+      }
+    }
+
+    function teacherApproveRequest(id) {
+      playJellyPopSound('approve');
+      const req = leaveRequests.find(r => r.id === id);
+      if (req) {
+        req.status = 'approved';
+        req.approvedTime = Date.now();
+      }
+      broadcastState();
+    }
+
+    function teacherRejectRequest(id) {
+      playJellyPopSound('pop');
+      const req = leaveRequests.find(r => r.id === id);
+      if (req) {
+        req.status = 'rejected';
+      }
+      broadcastState();
+    }
+
+    function teacherMarkReturned(id) {
+      playJellyPopSound('pop');
+      leaveRequests = leaveRequests.filter(r => r.id !== id);
+      broadcastState();
+    }
+
+    function teacherSendFeedback(studentTarget, emoji, text) {
+      playJellyPopSound('approve');
+      studentFeedbacks.unshift({
+        id: "FB_" + Date.now(),
+        studentName: studentTarget,
+        emoji: emoji,
+        text: text,
+        timestamp: Date.now()
+      });
+      broadcastState();
+    }
+
+    function clearAllAnswers() {
+      playJellyPopSound('pop');
+      studentAnswers = [];
+      broadcastState();
+    }
+
+    function copyRoomCode() {
+      playJellyPopSound('pop');
+      navigator.clipboard.writeText(ROOM_CODE);
+      alert("已复制课堂房间号: " + ROOM_CODE);
+    }
+
+    // RENDER FUNCTIONS
+    function renderAll() {
+      renderStudentUI();
+      renderTeacherUI();
+    }
+
+    // RENDER STUDENT VIEW
+    function renderStudentUI() {
+      const myReq = leaveRequests.find(r => r.studentName === studentName);
+      const statusBox = document.getElementById('student-leave-status-box');
+      const statusBadge = document.getElementById('student-status-badge');
+      const timerContainer = document.getElementById('student-timer-container');
+
+      if (myReq) {
+        statusBox.classList.remove('hidden');
+        if (myReq.status === 'pending') {
+          statusBox.className = "jelly-card p-4 border-2 border-amber-300 bg-amber-50/80 transition-all";
+          statusBadge.innerHTML = `
+            <i class="fa-solid fa-hourglass-half text-amber-500 animate-spin"></i>
+            <span class="text-amber-800">申请中：${escapeHTML(myReq.reason)} (${myReq.durationMins}分钟)</span>
+          `;
+          timerContainer.classList.add('hidden');
+        } else if (myReq.status === 'approved') {
+          statusBox.className = "jelly-card p-4 border-2 border-emerald-400 bg-emerald-50/80 transition-all animate-squishy";
+          statusBadge.innerHTML = `
+            <i class="fa-solid fa-circle-check text-emerald-500 text-base"></i>
+            <span class="text-emerald-800 font-fun">老师已批准！请注意时间归队</span>
+          `;
+          timerContainer.classList.remove('hidden');
+        } else if (myReq.status === 'rejected') {
+          statusBox.className = "jelly-card p-4 border-2 border-rose-300 bg-rose-50/80 transition-all";
+          statusBadge.innerHTML = `
+            <i class="fa-solid fa-circle-xmark text-rose-500"></i>
+            <span class="text-rose-800 font-fun">老师暂时未批准外出，请安心上课哦</span>
+          `;
+          timerContainer.classList.add('hidden');
+        }
+      } else {
+        statusBox.classList.add('hidden');
+      }
+
+      // Render Feedback List
+      const myFeedbacks = studentFeedbacks.filter(f => f.studentName === studentName);
+      const fbList = document.getElementById('student-feedback-list');
+      if (myFeedbacks.length === 0) {
+        fbList.innerHTML = `<p class="text-[11px] text-slate-400 italic py-2 text-center">暂未收到互动评语~</p>`;
+      } else {
+        fbList.innerHTML = myFeedbacks.map(f => `
+          <div class="jelly-card p-2.5 bg-amber-50/90 border border-amber-200 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">${f.emoji}</span>
+              <span class="font-fun font-bold text-amber-900">${escapeHTML(f.text)}</span>
+            </div>
+            <span class="text-[10px] text-amber-600">${new Date(f.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    // RENDER TEACHER VIEW
+    function renderTeacherUI() {
+      const pendingCount = leaveRequests.filter(r => r.status === 'pending').length;
+      document.getElementById('badge-teacher-pending').textContent = pendingCount;
+      document.getElementById('badge-teacher-answers').textContent = studentAnswers.length;
+
+      const reqListElem = document.getElementById('teacher-requests-list');
+      if (leaveRequests.length === 0) {
+        reqListElem.innerHTML = `
+          <div class="jelly-card p-6 text-center border-dashed border-2 border-slate-200">
+            <span class="text-2xl block mb-1">☕</span>
+            <p class="font-fun font-bold text-xs text-slate-500">当前没有学生申请外出</p>
+            <p class="text-[10px] text-slate-400 mt-1">当学生提交申请时，卡片将立刻在这里出现~</p>
+          </div>
+        `;
+      } else {
+        reqListElem.innerHTML = leaveRequests.map(r => {
+          const isPending = r.status === 'pending';
+          const isApproved = r.status === 'approved';
+
+          return `
+            <div class="jelly-card p-3.5 border-2 ${isPending ? 'border-amber-300 bg-amber-50/50' : (isApproved ? 'border-emerald-300 bg-emerald-50/30' : 'border-rose-200 bg-rose-50/30')} space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="font-fun font-bold text-xs text-slate-800 flex items-center gap-1.5">
+                  <span class="text-sm">👤</span> ${escapeHTML(r.studentName)}
+                </span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isPending ? 'bg-amber-200 text-amber-800' : (isApproved ? 'bg-emerald-200 text-emerald-800' : 'bg-rose-200 text-rose-800')}">
+                  ${isPending ? '待处理' : (isApproved ? '已批准' : '未批准')}
+                </span>
+              </div>
+
+              <div class="text-xs bg-white/80 p-2 rounded-xl border border-slate-200/80">
+                <p class="font-bold text-slate-700">${escapeHTML(r.reason)}</p>
+                <p class="text-[10px] text-slate-500">申请时长：${r.durationMins} 分钟 ${r.customNote ? '• ' + escapeHTML(r.customNote) : ''}</p>
+              </div>
+
+              ${isPending ? `
+                <div class="flex gap-2 pt-1">
+                  <button onclick="teacherApproveRequest('${r.id}')" class="flex-1 py-1.5 rounded-xl jelly-btn jelly-mint font-fun font-bold text-xs flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-check"></i> 批准外出
+                  </button>
+                  <button onclick="teacherRejectRequest('${r.id}')" class="px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-600 font-fun font-bold text-xs transition">
+                    拒绝
+                  </button>
+                </div>
+              ` : `
+                <div class="flex gap-2 pt-1">
+                  <button onclick="teacherMarkReturned('${r.id}')" class="w-full py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-fun font-bold text-xs transition flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-flag"></i> 标记归队 / 清除记录
+                  </button>
+                </div>
+              `}
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Render Teacher Answers Inbox
+      const ansListElem = document.getElementById('teacher-answers-list');
+      if (studentAnswers.length === 0) {
+        ansListElem.innerHTML = `
+          <div class="jelly-card p-6 text-center border-dashed border-2 border-slate-200">
+            <span class="text-2xl block mb-1">📮</span>
+            <p class="font-fun font-bold text-xs text-slate-500">尚无提交的个人答案</p>
+            <p class="text-[10px] text-slate-400 mt-1">学生提交答案后仅在此处对您单独公开</p>
+          </div>
+        `;
+      } else {
+        ansListElem.innerHTML = studentAnswers.map(a => `
+          <div class="jelly-card p-3.5 border border-purple-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-fun font-bold text-xs text-purple-900">${escapeHTML(a.studentName)}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700 border border-purple-200">
+                ${a.questionNum}
+              </span>
+            </div>
+
+            <div class="bg-purple-50/60 p-2.5 rounded-xl text-xs text-slate-700 border border-purple-100 space-y-1">
+              ${a.choiceOption ? `<p class="font-bold text-purple-700">选择项: <span class="text-base">${a.choiceOption}</span></p>` : ''}
+              ${a.answerText ? `<p class="text-slate-600">${escapeHTML(a.answerText)}</p>` : ''}
+            </div>
+
+            <!-- Praise / Feedback Action Buttons -->
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-[10px] text-slate-400">${new Date(a.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+              <div class="flex items-center gap-1">
+                <button onclick="teacherSendFeedback('${a.studentName}', '🌹', '送你朵小红花！表现太棒了')" class="px-2 py-1 rounded-lg bg-pink-100 hover:bg-pink-200 text-pink-700 text-[10px] font-bold transition">
+                  🌹 送小红花
+                </button>
+                <button onclick="teacherSendFeedback('${a.studentName}', '👍', '思路非常清晰！点赞')" class="px-2 py-1 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 text-[10px] font-bold transition">
+                  👍 点赞
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // Global Countdown Loop (For approved student exit countdowns)
+    setInterval(() => {
+      const myReq = leaveRequests.find(r => r.studentName === studentName && r.status === 'approved');
+      if (myReq && myReq.approvedTime) {
+        const elapsedSec = Math.floor((Date.now() - myReq.approvedTime) / 1000);
+        const totalSec = myReq.durationMins * 60;
+        const remainSec = Math.max(0, totalSec - elapsedSec);
+
+        const m = Math.floor(remainSec / 60).toString().padStart(2, '0');
+        const s = (remainSec % 60).toString().padStart(2, '0');
+
+        const timerTxt = document.getElementById('student-timer-text');
+        if (timerTxt) {
+          timerTxt.textContent = `${m}:${s}`;
+          if (remainSec === 0) {
+            timerTxt.className = "text-2xl font-fun font-extrabold text-rose-600 my-0.5 animate-pulse";
+          }
+        }
+      }
+    }, 1000);
+
+    // Initial load
+    window.onload = function() {
+      loadPersistedState();
+    };
+  </script>
+</body>
+</html>
